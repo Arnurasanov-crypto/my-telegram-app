@@ -1,13 +1,14 @@
 import os
 import asyncio
 import logging
-from http.server import HTTPServer, BaseHTTPRequestHandler
+import json
 import threading
-from aiogram import Bot, Dispatcher, html
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from aiogram import Bot, Dispatcher, F
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 
-# 1. Веб-сервер для порта Render
+# 1. Веб-сервер для Render
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
@@ -21,15 +22,26 @@ def run_server():
 
 threading.Thread(target=run_server, daemon=True).start()
 
-# 2. Инициализация Aiogram 3
+# 2. Инициализация Ботa
 TOKEN = os.environ.get("BOT_TOKEN")
 dp = Dispatcher()
 
 @dp.message(CommandStart())
-def command_start_handler(message: Message) -> None:
-    message.answer(f"Привет, {html.bold(message.from_user.full_name)}!")
+async def start_cmd(message: Message):
+    await message.answer("Привет! Открой мини-приложение через меню слева внизу, чтобы начать играть и управлять балансом.")
 
-async def main() -> None:
+# Обработка данных, пришедших из Web App
+@dp.message(F.web_app_data)
+async def handle_web_app_data(message: Message):
+    data = json.loads(message.web_app_data.data)
+    action = data.get("action")
+
+    if action == "deposit":
+        await message.answer("💳 **Пополнение баланса**\n\nОтправьте сумму пополнения или переведите средства на указанный кошелек.")
+    elif action == "withdraw":
+        await message.answer("💸 **Вывод средств**\n\nВведите ваш адрес кошелька (USDT TON / TRC20) для вывода средств.")
+
+async def main():
     bot = Bot(token=TOKEN)
     await dp.start_polling(bot)
 
