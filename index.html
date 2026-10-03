@@ -1,73 +1,59 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Earn Simulator</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-body {
-font-family: Arial, sans-serif;
-background-color: #1c1c1e;
-color: #ffffff;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-height: 100vh;
-margin: 0;
-}
-.card {
-background: #2c2c2e;
-padding: 24px;
-border-radius: 16px;
-text-align: center;
-box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-width: 80%;
-max-width: 320px;
-}
-.balance {
-font-size: 32px;
-font-weight: bold;
-color: #34c759;
-margin: 16px 0;
-}
-button {
-background-color: #007aff;
-color: white;
-border: none;
-padding: 14px 24px;
-font-size: 18px;
-border-radius: 12px;
-cursor: pointer;
-width: 100%;
-margin-top: 10px;
-}
-button:active {
-transform: scale(0.98);
-}
-</style>
-</head>
-<body>
-
+<!-- Карточка баланса -->
 <div class="card">
-<h2>Симулятор Заработка</h2>
-<div>Ваш баланс:</div>
-<div class="balance" id="balance">0 $</div>
-<button onclick="mine()">Заработать 10 $</button>
+    <div class="balance-title">Ваш баланс</div>
+    <div class="balance-amount"><span id="balance">0.00</span> USDT</div>
+    <div class="btn-group">
+        <button onclick="deposit()">➕ Пополнить</button>
+        <button class="withdraw" onclick="withdraw()">➖ Вывести</button>
+    </div>
+</div>
+
+<!-- Мини-игра: Кости -->
+<div class="card">
+    <h3>🎲 Игра "Угадай число (>3)"</h3>
+    <p>Ставка: 1 USDT. Выигрыш: 2 USDT (если выпадет 4, 5 или 6)</p>
+    <div class="dice-result" id="dice">-</div>
+    <button class="game" onclick="playDice()">Бросить кость (1 USDT)</button>
 </div>
 
 <script>
-let tg = window.Telegram.WebApp;
-tg.expand();
+    const tg = window.Telegram.WebApp;
+    tg.expand(); // Разворачиваем на весь экран
 
-let currentBalance = 0;
+    let userBalance = 10.00; // Временный баланс для теста (позже подтянем с бэкенда)
 
-function mine() {
-currentBalance += 10;
-document.getElementById('balance').innerText = currentBalance + " $";
-}
+    function updateUI() {
+        document.getElementById('balance').innerText = userBalance.toFixed(2);
+    }
+
+    function deposit() {
+        tg.sendData(JSON.stringify({ action: "deposit_request" }));
+        alert("Инструкция по пополнению отправлена вам в чат с ботом!");
+    }
+
+    function withdraw() {
+        tg.sendData(JSON.stringify({ action: "withdraw_request" }));
+        alert("Запрос на вывод средств отправлен боту!");
+    }
+
+    function playDice() {
+        if (userBalance < 1) {
+            alert("Недостаточно средств на балансе!");
+            return;
+        }
+        userBalance -= 1;
+        
+        const roll = Math.floor(Math.random() * 6) + 1;
+        document.getElementById('dice').innerText = roll;
+
+        if (roll > 3) {
+            userBalance += 2;
+            alert(`Вы выиграли! Выпало ${roll}. +2 USDT`);
+        } else {
+            alert(`Вы проиграли! Выпало ${roll}.`);
+        }
+        updateUI();
+    }
+
+    updateUI();
 </script>
-
-</body>
-</html>
