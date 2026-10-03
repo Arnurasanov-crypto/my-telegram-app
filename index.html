@@ -1,58 +1,61 @@
-<!-- Карточка баланса -->
+<!-- Карточка Баланса -->
 <div class="card">
     <div class="balance-title">Ваш баланс</div>
-    <div class="balance-amount"><span id="balance">0.00</span> USDT</div>
+    <div class="balance-amount"><span id="balance">10.00</span> USDT</div>
     <div class="btn-group">
         <button onclick="deposit()">➕ Пополнить</button>
         <button class="withdraw" onclick="withdraw()">➖ Вывести</button>
     </div>
 </div>
 
-<!-- Мини-игра: Кости -->
+<!-- Мини-игра -->
 <div class="card">
-    <h3>🎲 Игра "Угадай число (>3)"</h3>
-    <p>Ставка: 1 USDT. Выигрыш: 2 USDT (если выпадет 4, 5 или 6)</p>
-    <div class="dice-result" id="dice">-</div>
+    <h3 style="margin-top:0;">🎲 Игра "Больше 3"</h3>
+    <p style="color:#8e8e93; font-size:14px;">Ставка: 1 USDT. Выигрыш: 2 USDT (если выпадет 4, 5 или 6)</p>
+    <div class="dice-box" id="dice">🎲</div>
     <button class="game" onclick="playDice()">Бросить кость (1 USDT)</button>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp;
-    tg.expand(); // Разворачиваем на весь экран
+    tg.expand();
 
-    let userBalance = 10.00; // Временный баланс для теста (позже подтянем с бэкенда)
+    let balance = 10.00;
 
     function updateUI() {
-        document.getElementById('balance').innerText = userBalance.toFixed(2);
+        document.getElementById('balance').innerText = balance.toFixed(2);
     }
 
     function deposit() {
-        tg.sendData(JSON.stringify({ action: "deposit_request" }));
-        alert("Инструкция по пополнению отправлена вам в чат с ботом!");
+        tg.sendData(JSON.stringify({ action: "deposit" }));
+        tg.close();
     }
 
     function withdraw() {
-        tg.sendData(JSON.stringify({ action: "withdraw_request" }));
-        alert("Запрос на вывод средств отправлен боту!");
+        tg.sendData(JSON.stringify({ action: "withdraw" }));
+        tg.close();
     }
 
     function playDice() {
-        if (userBalance < 1) {
-            alert("Недостаточно средств на балансе!");
+        if (balance < 1) {
+            alert("Недостаточно средств!");
             return;
         }
-        userBalance -= 1;
+        balance -= 1;
         
         const roll = Math.floor(Math.random() * 6) + 1;
-        document.getElementById('dice').innerText = roll;
+        const diceIcons = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣"];
+        document.getElementById('dice').innerText = diceIcons[roll - 1];
 
-        if (roll > 3) {
-            userBalance += 2;
-            alert(`Вы выиграли! Выпало ${roll}. +2 USDT`);
-        } else {
-            alert(`Вы проиграли! Выпало ${roll}.`);
-        }
-        updateUI();
+        setTimeout(() => {
+            if (roll > 3) {
+                balance += 2;
+                alert(`🎉 Вы выиграли! Выпало ${roll}. +2 USDT`);
+            } else {
+                alert(`❌ Проигрыш. Выпало ${roll}.`);
+            }
+            updateUI();
+        }, 100);
     }
 
     updateUI();
