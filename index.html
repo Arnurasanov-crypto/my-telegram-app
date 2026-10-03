@@ -14,8 +14,8 @@
         <div style="font-size: 14px; color: #aaa;">Ваш баланс</div>
         <div style="font-size: 36px; font-weight: bold; color: #4caf50; margin: 10px 0;"><span id="balance">10.00</span> USDT</div>
         <div style="display: flex; gap: 10px;">
-            <button onclick="deposit()" style="flex: 1; background: #2196f3; color: #fff; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">➕ Пополнить</button>
-            <button onclick="withdraw()" style="flex: 1; background: #f44336; color: #fff; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">➖ Вывести</button>
+            <button onclick="sendAction('deposit')" style="flex: 1; background: #2196f3; color: #fff; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">➕ Пополнить</button>
+            <button onclick="sendAction('withdraw')" style="flex: 1; background: #f44336; color: #fff; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">➖ Вывести</button>
         </div>
     </div>
 
@@ -37,13 +37,9 @@
             document.getElementById('balance').innerText = userBalance.toFixed(2);
         }
 
-        function deposit() {
-            tg.sendData(JSON.stringify({ action: "deposit" }));
-            tg.close();
-        }
-
-        function withdraw() {
-            tg.sendData(JSON.stringify({ action: "withdraw" }));
+        function sendAction(actionType) {
+            // Отправляем команду бэкенду и закрываем Mini App
+            tg.sendData(JSON.stringify({ action: actionType }));
             tg.close();
         }
 
