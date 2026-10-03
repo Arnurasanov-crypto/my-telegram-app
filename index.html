@@ -1,62 +1,75 @@
-<!-- Карточка Баланса -->
-<div class="card">
-    <div class="balance-title">Ваш баланс</div>
-    <div class="balance-amount"><span id="balance">10.00</span> USDT</div>
-    <div class="btn-group">
-        <button onclick="deposit()">➕ Пополнить</button>
-        <button class="withdraw" onclick="withdraw()">➖ Вывести</button>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>ProfitX</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body style="background-color: #121212 !important; color: #ffffff !important; font-family: sans-serif; padding: 16px; margin: 0;">
+
+    <!-- Карточка Баланса -->
+    <div style="background: #1e1e1e; border: 1px solid #333; border-radius: 16px; padding: 20px; margin-bottom: 16px; text-align: center;">
+        <div style="font-size: 14px; color: #aaa;">Ваш баланс</div>
+        <div style="font-size: 36px; font-weight: bold; color: #4caf50; margin: 10px 0;"><span id="balance">10.00</span> USDT</div>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="deposit()" style="flex: 1; background: #2196f3; color: #fff; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">➕ Пополнить</button>
+            <button onclick="withdraw()" style="flex: 1; background: #f44336; color: #fff; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">➖ Вывести</button>
+        </div>
     </div>
-</div>
 
-<!-- Мини-игра -->
-<div class="card">
-    <h3 style="margin-top:0;">🎲 Игра "Больше 3"</h3>
-    <p style="color:#8e8e93; font-size:14px;">Ставка: 1 USDT. Выигрыш: 2 USDT (если выпадет 4, 5 или 6)</p>
-    <div class="dice-box" id="dice">🎲</div>
-    <button class="game" onclick="playDice()">Бросить кость (1 USDT)</button>
-</div>
+    <!-- Карточка Мини-игры -->
+    <div style="background: #1e1e1e; border: 1px solid #333; border-radius: 16px; padding: 20px; text-align: center;">
+        <h3 style="margin-top: 0; color: #fff;">🎲 Игра "Больше 3"</h3>
+        <p style="font-size: 13px; color: #aaa;">Ставка: 1 USDT | Выигрыш: 2 USDT (при 4, 5, 6)</p>
+        <div id="dice" style="font-size: 60px; margin: 15px 0;">🎲</div>
+        <button onclick="playDice()" style="width: 100%; background: #ff9800; color: #fff; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">Бросить кость (1 USDT)</button>
+    </div>
 
-<script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-    let balance = 10.00;
+        let userBalance = 10.00;
 
-    function updateUI() {
-        document.getElementById('balance').innerText = balance.toFixed(2);
-    }
-
-    function deposit() {
-        tg.sendData(JSON.stringify({ action: "deposit" }));
-        tg.close();
-    }
-
-    function withdraw() {
-        tg.sendData(JSON.stringify({ action: "withdraw" }));
-        tg.close();
-    }
-
-    function playDice() {
-        if (balance < 1) {
-            alert("Недостаточно средств!");
-            return;
+        function updateUI() {
+            document.getElementById('balance').innerText = userBalance.toFixed(2);
         }
-        balance -= 1;
-        
-        const roll = Math.floor(Math.random() * 6) + 1;
-        const diceIcons = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣"];
-        document.getElementById('dice').innerText = diceIcons[roll - 1];
 
-        setTimeout(() => {
-            if (roll > 3) {
-                balance += 2;
-                alert(`🎉 Вы выиграли! Выпало ${roll}. +2 USDT`);
-            } else {
-                alert(`❌ Проигрыш. Выпало ${roll}.`);
+        function deposit() {
+            tg.sendData(JSON.stringify({ action: "deposit" }));
+            tg.close();
+        }
+
+        function withdraw() {
+            tg.sendData(JSON.stringify({ action: "withdraw" }));
+            tg.close();
+        }
+
+        function playDice() {
+            if (userBalance < 1) {
+                alert("Недостаточно средств!");
+                return;
             }
-            updateUI();
-        }, 100);
-    }
+            userBalance -= 1;
+            
+            const roll = Math.floor(Math.random() * 6) + 1;
+            const diceIcons = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣"];
+            document.getElementById('dice').innerText = diceIcons[roll - 1];
 
-    updateUI();
-</script>
+            setTimeout(() => {
+                if (roll > 3) {
+                    userBalance += 2;
+                    alert(`🎉 Вы выиграли! Выпало ${roll}. +2 USDT`);
+                } else {
+                    alert(`❌ Проигрыш. Выпало ${roll}.`);
+                }
+                updateUI();
+            }, 150);
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
