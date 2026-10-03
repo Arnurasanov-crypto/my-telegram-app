@@ -1,9 +1,13 @@
 import os
-import threading
+import asyncio
+import logging
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from telebot import TeleBot
+import threading
+from aiogram import Bot, Dispatcher, html
+from aiogram.filters import CommandStart
+from aiogram.types import Message
 
-# 1. Запуск мини-веб-сервера для Render
+# 1. Веб-сервер для порта Render
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
@@ -17,13 +21,18 @@ def run_server():
 
 threading.Thread(target=run_server, daemon=True).start()
 
-# 2. Запуск Telegram-бота
+# 2. Инициализация Aiogram 3
 TOKEN = os.environ.get("BOT_TOKEN")
-bot = TeleBot(TOKEN)
+dp = Dispatcher()
 
-@bot.message_handler(commands=['start'])
-def send_welcome(message):
-    bot.reply_to(message, "Привет! Бот работает.")
+@dp.message(CommandStart())
+def command_start_handler(message: Message) -> None:
+    message.answer(f"Привет, {html.bold(message.from_user.full_name)}!")
+
+async def main() -> None:
+    bot = Bot(token=TOKEN)
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    bot.infinity_polling()
+    logging.basicConfig(level=logging.INFO)
+    asyncio.run(main())
